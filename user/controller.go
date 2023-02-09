@@ -2,7 +2,7 @@ package user
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 )
@@ -10,7 +10,7 @@ import (
 func AddNewUserController() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Print("AddNewUser end-point called")
-		d, err := ioutil.ReadAll(r.Body)
+		d, err := io.ReadAll(r.Body)
 		if err != nil {
 			log.Printf("ERROR: %s\n", err)
 			w.WriteHeader(http.StatusBadRequest)
@@ -24,7 +24,7 @@ func AddNewUserController() func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(data)
-	
+
 	}
 }
 
