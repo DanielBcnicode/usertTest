@@ -19,10 +19,12 @@ func AddNewUserController() func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		log.Printf("Payload: %s\n", string(d))
-		data := User{}
+		data := NewUser()
 		json.Unmarshal(d, &data)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(data)
+	
 	}
 }
 

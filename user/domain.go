@@ -29,8 +29,10 @@ func NewUserFromName(firstName, lastName string) User {
 }
 
 func NewUser() User {
+	t := time.Now()
 	return User{
 		ID:        uuid.New(),
-		CreatedAt: time.Now(),
+		CreatedAt: t,
+		UpdatedAt: t,
 	}
 }
