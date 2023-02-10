@@ -5,10 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"usertest.com/config"
 	"usertest.com/user"
 )
 
 func main() {
+	config := config.GetConfig()
+	log.Print(config)
 	log.Print("Server started at port 8088")
 	http.ListenAndServe(":8088", Server())
 }

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"time"
 
 	"github.com/google/uuid"
@@ -35,4 +36,18 @@ func NewUser() User {
 		CreatedAt: t,
 		UpdatedAt: t,
 	}
+}
+
+type FieldFilter struct {
+	Operation string
+	Name      string
+	Value     interface{}
+}
+type RepositoryFilter struct {
+	Filters []map[string]FieldFilter
+}
+
+type UserRepo interface {
+	Save(user *User) error
+	FindByFilter(ctx context.Context, filter RepositoryFilter) ([]User, error)
 }
