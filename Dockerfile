@@ -15,6 +15,4 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/userapp /app/userapp
-
-# Run the web service on container startup.
 CMD ["/app/userapp"]
