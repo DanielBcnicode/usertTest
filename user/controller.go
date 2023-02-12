@@ -1,13 +1,14 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 )
 
-func AddNewUserController() func(w http.ResponseWriter, r *http.Request) {
+func AddNewUserController(userRepository UserRepo) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Print("AddNewUser end-point called")
 		d, err := io.ReadAll(r.Body)
@@ -24,6 +25,11 @@ func AddNewUserController() func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(data)
+
+		err = userRepository.Save(context.TODO(), &data)
+		if err != nil {
+			log.Printf("Error creating row: %s\n", err)
+		}
 
 	}
 }

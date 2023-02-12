@@ -3,10 +3,11 @@ package config
 import "os"
 
 type DatabaseConfig struct {
+	Host     string
+	Port     string
 	User     string
 	Password string
 	Database string
-	Url      string
 }
 
 type Config struct {
@@ -18,6 +19,7 @@ func GetConfig() *Config {
 		User:     os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PASSWORD"),
 		Database: os.Getenv("DB_DATABASE"),
-		Url:      os.Getenv("DB_URL"),
+		Host:  os.Getenv("DB_HOST"),
+		Port: os.Getenv("DB_PORT"),
 	}}
 }

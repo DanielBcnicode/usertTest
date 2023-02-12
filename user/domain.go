@@ -19,6 +19,28 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+func NewUserFromModel(
+	id uuid.UUID,
+	firstName string,
+	lastName string,
+	nickName string,
+	password string,
+	email string,
+	country string,
+	createdAt time.Time,
+	updateAt time.Time,
+) (User, error) {
+	return User{
+		ID: id,
+		FirstName: firstName,
+		LastName: lastName,
+		NickName: nickName,
+		Password: password,
+		Email: email,
+		CreatedAt: createdAt,
+		UpdatedAt: updateAt,
+	}, nil
+} 
 // NewUserFromName create a User entity from a firstname and lastname
 func NewUserFromName(firstName, lastName string) User {
 	return User{
@@ -47,7 +69,14 @@ type RepositoryFilter struct {
 	Filters []map[string]FieldFilter
 }
 
+type Paginator struct {
+	PagSize int
+	CurrentPage int
+	NextPage int
+}
+
 type UserRepo interface {
-	Save(user *User) error
-	FindByFilter(ctx context.Context, filter RepositoryFilter) ([]User, error)
+	Save(ctx context.Context, user *User) error
+	Update(ctx context.Context, user *User) error
+	FindByFilter(ctx context.Context, filter RepositoryFilter, paginaror *Paginator) ([]User, error)
 }
