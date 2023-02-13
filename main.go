@@ -42,20 +42,26 @@ func Server() *mux.Router {
 	s.HandleFunc("/health_check", health_check)
 
 	server := s.PathPrefix("/api/v1/").Subrouter()
-	server.HandleFunc("/user", user.ListUserController()).Methods("GET")
+	server.HandleFunc("/user", ListUserController).Methods("GET")
 	//server.HandleFunc("/user/{id}", user.ListUserController()).Methods("GET")
 	server.HandleFunc("/user", AddNewUserController).Methods("POST")
-	server.HandleFunc("/user/{id}", user.DeleteUserController()).Methods("DELETE")
-	server.HandleFunc("/user/{id}", user.UpdateUserController()).Methods("PUT")
+	server.HandleFunc("/user/{id}", DeleteUserController).Methods("DELETE")
+	server.HandleFunc("/user/{id}", UpdateUserController).Methods("PUT")
 
 	return s
 }
 
 func initializeControllers(db *repository.PostgresConn) error {
 	userRepository := repository.NewUserPostgresRepository(db)
+
 	AddNewUserController = user.AddNewUserController(&userRepository)
+	ListUserController = user.ListUserController(&userRepository)
+	UpdateUserController = user.UpdateUserController(&userRepository)
+	DeleteUserController = user.DeleteUserController(&userRepository)
+
 	return nil
 }
+
 func health_check(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
@@ -72,5 +78,5 @@ func initDatabase(conf *config.Config) (*repository.PostgresConn, error) {
 
 	log.Printf("Connection URL: %s\n", connString)
 
-	return repository.NewPostgressConn(connString)
+	return repository.NewPostgresConn(connString)
 }

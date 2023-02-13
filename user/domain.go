@@ -31,16 +31,17 @@ func NewUserFromModel(
 	updateAt time.Time,
 ) (User, error) {
 	return User{
-		ID: id,
+		ID:        id,
 		FirstName: firstName,
-		LastName: lastName,
-		NickName: nickName,
-		Password: password,
-		Email: email,
+		LastName:  lastName,
+		NickName:  nickName,
+		Password:  password,
+		Email:     email,
 		CreatedAt: createdAt,
 		UpdatedAt: updateAt,
 	}, nil
-} 
+}
+
 // NewUserFromName create a User entity from a firstname and lastname
 func NewUserFromName(firstName, lastName string) User {
 	return User{
@@ -60,6 +61,10 @@ func NewUser() User {
 	}
 }
 
+func (u *User) UpdateDate() {
+	u.UpdatedAt = time.Now()
+}
+
 type FieldFilter struct {
 	Operation string
 	Name      string
@@ -70,13 +75,14 @@ type RepositoryFilter struct {
 }
 
 type Paginator struct {
-	PagSize int
+	PagSize     int
 	CurrentPage int
-	NextPage int
+	NextPage    int
 }
 
 type UserRepo interface {
 	Save(ctx context.Context, user *User) error
 	Update(ctx context.Context, user *User) error
-	FindByFilter(ctx context.Context, filter RepositoryFilter, paginaror *Paginator) ([]User, error)
+	FindByFilter(ctx context.Context, filter RepositoryFilter, paginator *Paginator) ([]User, error)
+	Delete(ctx context.Context, userId uuid.UUID) error
 }
