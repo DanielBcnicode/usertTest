@@ -10,10 +10,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"usertest.com/broker"
+	"usertest.com/event"
 	"usertest.com/user/common"
 )
 
-func AddNewUserController(uRe UserRepo) func(w http.ResponseWriter, r *http.Request) {
+func AddNewUserController(uRe UserRepo, br *broker.Rabbit) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Print("AddNewUser end-point called")
 		d, err := io.ReadAll(r.Body)
@@ -30,17 +32,37 @@ func AddNewUserController(uRe UserRepo) func(w http.ResponseWriter, r *http.Requ
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(data)
+
+		jsonPayload, err := json.Marshal(data)
+		if err != nil {
+			log.Printf("Error creating Marshalling user: %s\n", err)
+			return
+		}
+
+		_, err = w.Write(jsonPayload)
+		if err != nil {
+			log.Printf("Error writing AddNewUser response: %s\n", err)
+			return
+		}
 
 		err = uRe.Save(context.TODO(), &data)
 		if err != nil {
 			log.Printf("Error creating row: %s\n", err)
+			return
 		}
 
+		de := event.DomainEvent{
+			Type:        "UserAdded",
+			Version:     "1.0",
+			AggregateID: data.ID.String(),
+			Payload:     string(jsonPayload),
+		}
+		
+		br.PublishDomainEvent(&de)
 	}
 }
 
-func UpdateUserController(uRe UserRepo) func(w http.ResponseWriter, r *http.Request) {
+func UpdateUserController(uRe UserRepo, br *broker.Rabbit) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("UpdateUser end-point called")
 		id, ok := mux.Vars(r)["id"]
@@ -83,16 +105,31 @@ func UpdateUserController(uRe UserRepo) func(w http.ResponseWriter, r *http.Requ
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		err = json.NewEncoder(w).Encode(data)
+
+		jsonPayload, err := json.Marshal(data)
+		if err != nil {
+			log.Printf("Error updating Marshalling user: %s\n", err)
+			return
+		}
+
+		_, err = w.Write(jsonPayload)
 		if err != nil {
 			log.Printf("Error UpdateUser encoding: %s\n", err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
-
+		
+		de := event.DomainEvent{
+			Type:        "UserUpdated",
+			Version:     "1.0",
+			AggregateID: data.ID.String(),
+			Payload:     string(jsonPayload),
+		}
+		
+		br.PublishDomainEvent(&de)
 	}
 }
 
-func DeleteUserController(uRe UserRepo) func(w http.ResponseWriter, r *http.Request) {
+func DeleteUserController(uRe UserRepo, br *broker.Rabbit) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("DeleteUser end-point called")
 		w.Header().Set("Content-Type", "application/json")
@@ -121,6 +158,15 @@ func DeleteUserController(uRe UserRepo) func(w http.ResponseWriter, r *http.Requ
 		}
 
 		w.WriteHeader(http.StatusOK)
+
+		de := event.DomainEvent{
+			Type:        "UserDeleted",
+			Version:     "1.0",
+			AggregateID: uId.String(),
+			Payload:     "",
+		}
+		
+		br.PublishDomainEvent(&de)
 	}
 }
 
@@ -128,7 +174,7 @@ func ListUserController(userRepository UserRepo) func(w http.ResponseWriter, r *
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("ListUser end-point called")
 		w.Header().Set("Content-Type", "application/json")
-		
+
 		paginator := paginationData(r)
 		filter := filterData(r)
 		d, err := userRepository.FindByFilter(context.TODO(), filter, &paginator)

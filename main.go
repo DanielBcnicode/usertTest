@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"usertest.com/broker"
 	"usertest.com/config"
 	"usertest.com/user"
 	"usertest.com/user/repository"
@@ -22,12 +23,18 @@ func main() {
 	config := config.GetConfig()
 	db, err := initDatabase(config)
 	if err != nil {
-		log.Fatalf("ERROR: can't initialize db: %s", err)
+		log.Fatalf("ERROR: can't initialize db: %s\n", err)
 	}
-
 	defer db.Close()
 
-	initializeControllers(db)
+	broker, err:= broker.NewRabbitConnectionForDomain(config.MessageBroker)
+	if err != nil {
+		log.Fatalf("ERROR: can't initialize the broker: %s\n", err)
+	}
+	defer broker.Close()
+
+
+	initializeControllers(db, broker)
 
 	log.Printf("Configuration %#v\n", config)
 	log.Print("Server started at port 8088")
@@ -51,13 +58,14 @@ func Server() *mux.Router {
 	return s
 }
 
-func initializeControllers(db *repository.PostgresConn) error {
+func initializeControllers(db *repository.PostgresConn, br *broker.Rabbit) error {
+
 	userRepository := repository.NewUserPostgresRepository(db)
 
-	AddNewUserController = user.AddNewUserController(&userRepository)
+	AddNewUserController = user.AddNewUserController(&userRepository, br)
 	ListUserController = user.ListUserController(&userRepository)
-	UpdateUserController = user.UpdateUserController(&userRepository)
-	DeleteUserController = user.DeleteUserController(&userRepository)
+	UpdateUserController = user.UpdateUserController(&userRepository, br)
+	DeleteUserController = user.DeleteUserController(&userRepository, br)
 
 	return nil
 }

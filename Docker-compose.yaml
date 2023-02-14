@@ -34,6 +34,18 @@ services:
       #- ./pg/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     networks:
       - test
+  message-broker:
+    image: rabbitmq:3-management-alpine
+    container_name: message-broker
+    ports:
+      - 5672:5672
+      - 15672:15672
+    #volumes:
+    #  - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
+    #  - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
+    restart: always
+    networks:
+      - test
 
 #  postgresdb_test:
 #    image: postgres:latest

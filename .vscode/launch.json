@@ -16,8 +16,8 @@
             "DB_USER":"test",
             "DB_PASSWORD":"test",
             "DB_DATABASE":"test",
-            "DB_PORT":"1234"
-
+            "DB_PORT":"1234",
+            "MB_URL":"amqp://guest:guest@localhost:5672/"
         } //,
         // "envFile": "${workspaceFolder}//.env"
     }
