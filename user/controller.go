@@ -6,9 +6,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"usertest.com/user/common"
 )
 
 func AddNewUserController(uRe UserRepo) func(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +66,7 @@ func UpdateUserController(uRe UserRepo) func(w http.ResponseWriter, r *http.Requ
 
 			return
 		}
-		
+
 		log.Printf("Payload: %s\n", string(d))
 		data := NewUser()
 		json.Unmarshal(d, &data)
@@ -127,7 +129,9 @@ func ListUserController(userRepository UserRepo) func(w http.ResponseWriter, r *
 		log.Println("ListUser end-point called")
 		w.Header().Set("Content-Type", "application/json")
 		
-		d, err := userRepository.FindByFilter(context.TODO(),RepositoryFilter{}, nil)
+		paginator := paginationData(r)
+		filter := filterData(r)
+		d, err := userRepository.FindByFilter(context.TODO(), filter, &paginator)
 		if err != nil {
 			log.Printf("Error FindByFilter: %s\n", err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -142,4 +146,27 @@ func ListUserController(userRepository UserRepo) func(w http.ResponseWriter, r *
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	}
+}
+
+// Get filters from url. Only get variables defined in repository.FilterFields map
+func filterData(r *http.Request) RepositoryFilter {
+	f := make(map[string]string)
+
+	for i, _ := range common.FilterFields {
+		va := r.URL.Query().Get(i)
+		if va != "" {
+			f[i] = va
+		}
+	}
+	return RepositoryFilter{Filters: f}
+}
+
+// Get the paginator variables from the URL
+// Variable p contains the page wanted, 0 starting
+// Variable ps contains the items per page
+func paginationData(r *http.Request) Paginator {
+	p, _ := strconv.Atoi(r.URL.Query().Get("p"))
+	ps, _ := strconv.Atoi(r.URL.Query().Get("ps"))
+
+	return Paginator{CurrentPage: p, PagSize: ps}
 }

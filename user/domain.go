@@ -11,7 +11,7 @@ type User struct {
 	ID        uuid.UUID `json:"id,omitempty"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
-	NickName  string    `json:"nickname"`
+	Nickname  string    `json:"nickname"`
 	Password  string    `json:"password"`
 	Email     string    `json:"email"`
 	Country   string    `json:"country"`
@@ -34,7 +34,7 @@ func NewUserFromModel(
 		ID:        id,
 		FirstName: firstName,
 		LastName:  lastName,
-		NickName:  nickName,
+		Nickname:  nickName,
 		Password:  password,
 		Email:     email,
 		CreatedAt: createdAt,

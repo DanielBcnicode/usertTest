@@ -8,15 +8,8 @@ import (
 
 	"github.com/google/uuid"
 	"usertest.com/user"
+	"usertest.com/user/common"
 )
-
-var FilterFields = map[string]string{
-	"first_name": `"first_name"`,
-	"last_name":  `"last_name"`,
-	"nickname":   `"nickname"`,
-	"email":      `"email"`,
-	"country":    `"country"`,
-}
 
 type UserRepository struct {
 	Connection *PostgresConn
@@ -28,12 +21,12 @@ func NewUserPostgresRepository(conn *PostgresConn) UserRepository {
 
 func (u *UserRepository) Save(ctx context.Context, user *user.User) error {
 	q := `
-    INSERT INTO "user" ("id", "first_name", "last_name", "nick_name", "password", "email",
+    INSERT INTO "user" ("id", "first_name", "last_name", "nickname", "password", "email",
 	    "country", "created_at", "updated_at")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
     `
 	row := u.Connection.db.QueryRowContext(
-		ctx, q, user.ID, user.FirstName, user.LastName, user.NickName,
+		ctx, q, user.ID, user.FirstName, user.LastName, user.Nickname,
 		user.Password, user.Email, user.Country, user.CreatedAt, user.UpdatedAt,
 	)
 
@@ -42,10 +35,10 @@ func (u *UserRepository) Save(ctx context.Context, user *user.User) error {
 
 func (u *UserRepository) Update(ctx context.Context, user *user.User) error {
 	q := `
-    UPDATE "user" SET "first_name"=$1, "last_name"=$2, "nick_name"=$3, "password"=$4, "email"=$5,
+    UPDATE "user" SET "first_name"=$1, "last_name"=$2, "nickname"=$3, "password"=$4, "email"=$5,
 	    "country"=$6, "updated_at"=$7 WHERE "id"=$8;
     `
-	res, err := u.Connection.db.ExecContext(ctx, q, user.FirstName, user.LastName, user.NickName,
+	res, err := u.Connection.db.ExecContext(ctx, q, user.FirstName, user.LastName, user.Nickname,
 		user.Password, user.Email, user.Country, user.UpdatedAt,
 		user.ID)
 
@@ -101,7 +94,7 @@ func (u *UserRepository) FindByFilter(ctx context.Context, filter user.Repositor
 		return d, err
 	}
 
-	q := ` SELECT "id", "first_name", "last_name", "nick_name", "password", "email",
+	q := ` SELECT "id", "first_name", "last_name", "nickname", "password", "email",
 	"country", "created_at", "updated_at" FROM "user"`
 	l := ` LIMIT $1 OFFSET $2;`
 	q += f + l
@@ -118,7 +111,7 @@ func (u *UserRepository) FindByFilter(ctx context.Context, filter user.Repositor
 			&user.ID,
 			&user.FirstName,
 			&user.LastName,
-			&user.NickName,
+			&user.Nickname,
 			&user.Password,
 			&user.Email,
 			&user.Country,
@@ -144,15 +137,15 @@ func generateUserFilterQuery(filter user.RepositoryFilter) (string, error) {
 		if i == 0 {
 			s = " WHERE "
 		}
-		f, ok := FilterFields[k]
+		f, ok := common.FilterFields[k]
 		if !ok {
 			return "", fmt.Errorf("filter '%s' not allowed", k)
 		}
-		//Add ´AND´ clausule it there are more than one filter 
+		//Add ´AND´ clause it there are more than one filter
 		if i > 0 {
 			s += "AND "
 		}
-		s += f + ` = "` + v + `" `
+		s += f + ` = '` + v + `' `
 		i++
 	}
 

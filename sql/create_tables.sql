@@ -5,7 +5,7 @@ CREATE TABLE "user" (
     id uuid NOT NULL PRIMARY KEY,
     first_name text,
     last_name text,
-    nick_name text,
+    nickname text,
     password text,
     email text,
     country text,
