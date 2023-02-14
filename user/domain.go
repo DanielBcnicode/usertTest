@@ -65,13 +65,8 @@ func (u *User) UpdateDate() {
 	u.UpdatedAt = time.Now()
 }
 
-type FieldFilter struct {
-	Operation string
-	Name      string
-	Value     interface{}
-}
 type RepositoryFilter struct {
-	Filters []map[string]FieldFilter
+	Filters map[string]string
 }
 
 type Paginator struct {
