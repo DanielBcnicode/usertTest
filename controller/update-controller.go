@@ -1,4 +1,4 @@
-package user
+package controller
 
 import (
 	"context"
@@ -11,9 +11,10 @@ import (
 	"github.com/gorilla/mux"
 	"usertest.com/broker"
 	"usertest.com/event"
+	"usertest.com/user"
 )
 
-func UpdateUserController(uRe UserRepo, br broker.Broker) func(w http.ResponseWriter, r *http.Request) {
+func UpdateUserController(uRe user.UserRepo, br broker.Broker) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("UpdateUser end-point called")
 		id, ok := mux.Vars(r)["id"]
@@ -41,7 +42,7 @@ func UpdateUserController(uRe UserRepo, br broker.Broker) func(w http.ResponseWr
 		}
 
 		log.Printf("Payload: %s\n", string(d))
-		data := NewUser()
+		data := user.NewUser()
 		json.Unmarshal(d, &data)
 		data.UpdateDate()
 		data.ID = uId

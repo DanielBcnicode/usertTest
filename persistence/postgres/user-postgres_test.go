@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"testing"
@@ -31,13 +31,13 @@ func Test_generateUserFilterQuery(t *testing.T) {
 		{
 			name: "one filter added",
 			args: args{filter: user.RepositoryFilter{Filters: map[string]string{"first_name":"Joe"}}},
-			want: ` WHERE "first_name" = "Joe" `,
+			want: ` WHERE "first_name" = 'Joe' `,
 			wantErr: false,
 		},
 		{
 			name: "two filters added",
 			args: args{filter: user.RepositoryFilter{Filters: map[string]string{"first_name":"Joe","last_name":"Greenfield"}}},
-			want: ` WHERE "first_name" = "Joe" AND "last_name" = "Greenfield" `,
+			want: ` WHERE "first_name" = 'Joe' AND "last_name" = 'Greenfield' `,
 			wantErr: false,
 		},
 	}

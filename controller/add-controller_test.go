@@ -1,6 +1,7 @@
-package user
+package controller
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -8,16 +9,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"usertest.com/broker"
-	"serest.com/user"
-	"usertest.com/user/repository"
+	"usertest.com/user"
+
+	"usertest.com/persistence/memory"
 )
 
 func Test_AddNewUserController(t *testing.T) {
 	data := []user.User{
 		{
-			ID:        "",
+			ID:        uuid.New(),
 			FirstName: "a",
 			LastName:  "a",
 			Nickname:  "a",
@@ -28,7 +31,7 @@ func Test_AddNewUserController(t *testing.T) {
 			UpdatedAt: time.Now(),
 		},
 	}
-	fakeRepo := repository.NewMemoryUserRepository(data)
+	fakeRepo := memory.NewMemoryUserRepository(data)
 	fakeQueue := broker.NewFakeMemoryQueue()
 	service := AddNewUserController(&fakeRepo, fakeQueue)
 
@@ -52,8 +55,17 @@ func Test_AddNewUserController(t *testing.T) {
 
 	res := rr.Result()
 	resBody, _ := io.ReadAll(res.Body)
+	u := user.User{}
+	_ = json.Unmarshal(resBody, &u)
 
-	assert.Equal(t, http.StatusOK, res)
-	assert.NotNil(t, resBody)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, "Name", u.FirstName)
+	id := u.ID.String()
+	// Check the uuid generated length 
+	assert.True(t, len(id) == 36)
+	// Check if the element is stored
+	assert.Equal(t, 2, len(fakeRepo.Data))
+ 	// Test if the message was send
+	assert.Equal(t, 1, len(fakeQueue.Queue))
 
 }

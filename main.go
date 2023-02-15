@@ -8,8 +8,8 @@ import (
 	"github.com/gorilla/mux"
 	"usertest.com/broker"
 	"usertest.com/config"
-	"usertest.com/user"
-	"usertest.com/user/repository"
+	"usertest.com/controller"
+	"usertest.com/persistence/postgres"
 )
 
 var (
@@ -27,12 +27,11 @@ func main() {
 	}
 	defer db.Close()
 
-	broker, err:= broker.NewRabbitConnectionForDomain(config.MessageBroker)
+	broker, err := broker.NewRabbitConnectionForDomain(config.MessageBroker)
 	if err != nil {
 		log.Fatalf("ERROR: can't initialize the broker: %s\n", err)
 	}
 	defer broker.Close()
-
 
 	initializeControllers(db, broker)
 
@@ -58,14 +57,14 @@ func Server() *mux.Router {
 	return s
 }
 
-func initializeControllers(db *repository.PostgresConn, br *broker.Rabbit) error {
+func initializeControllers(db *postgres.PostgresConn, br *broker.Rabbit) error {
 
-	userRepository := repository.NewUserPostgresRepository(db)
+	userRepository := postgres.NewUserPostgresRepository(db)
 
-	AddNewUserController = user.AddNewUserController(&userRepository, br)
-	ListUserController = user.ListUserController(&userRepository)
-	UpdateUserController = user.UpdateUserController(&userRepository, br)
-	DeleteUserController = user.DeleteUserController(&userRepository, br)
+	AddNewUserController = controller.AddNewUserController(&userRepository, br)
+	ListUserController = controller.ListUserController(&userRepository)
+	UpdateUserController = controller.UpdateUserController(&userRepository, br)
+	DeleteUserController = controller.DeleteUserController(&userRepository, br)
 
 	return nil
 }
@@ -74,7 +73,7 @@ func health_check(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func initDatabase(conf *config.Config) (*repository.PostgresConn, error) {
+func initDatabase(conf *config.Config) (*postgres.PostgresConn, error) {
 	connString := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%s/%s?sslmode=disable",
 		conf.Db.User,
@@ -86,5 +85,5 @@ func initDatabase(conf *config.Config) (*repository.PostgresConn, error) {
 
 	log.Printf("Connection URL: %s\n", connString)
 
-	return repository.NewPostgresConn(connString)
+	return postgres.NewPostgresConn(connString)
 }

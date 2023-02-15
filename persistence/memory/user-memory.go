@@ -1,4 +1,4 @@
-package repository
+package memory
 
 import (
 	"context"
@@ -23,7 +23,7 @@ func (u *MemoryUserRepository) Save(ctx context.Context, user *user.User) error 
 	u.mu.Lock()
 	u.Data = append(u.Data, *user)
 	u.mu.Unlock()
-	
+
 	return nil
 }
 
@@ -67,18 +67,18 @@ func (u *MemoryUserRepository) Delete(ctx context.Context, userId uuid.UUID) err
 	}
 
 	ret := make([]user.User, 0)
-    ret = append(ret, u.Data[:po]...)
-    u.Data = append(ret, u.Data[po+1:]...)
+	ret = append(ret, u.Data[:po]...)
+	u.Data = append(ret, u.Data[po+1:]...)
 
 	return nil
 }
 
 // FindByFilter returns the users using pagination, in this memory repository implementation the filter
-// is avoided. 
+// is avoided.
 func (u *MemoryUserRepository) FindByFilter(ctx context.Context, filter user.RepositoryFilter, paginator *user.Paginator) ([]user.User, error) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
-	
+
 	d := make([]user.User, 0)
 	limit := 10
 	offset := 0
@@ -88,20 +88,20 @@ func (u *MemoryUserRepository) FindByFilter(ctx context.Context, filter user.Rep
 		}
 		offset = limit * paginator.CurrentPage
 	}
-	
+
 	m := len(u.Data)
 	if offset > m {
 		return d, nil
 	}
-	
+
 	t := limit
-	if offset + limit > m {
+	if offset+limit > m {
 		t = m - offset
 	}
 
 	for i := 0; i < t; i++ {
-		d = append(d, u.Data[offset + i])
+		d = append(d, u.Data[offset+i])
 	}
-	
+
 	return d, nil
 }

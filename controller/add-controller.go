@@ -1,4 +1,4 @@
-package user
+package controller
 
 import (
 	"context"
@@ -9,9 +9,10 @@ import (
 
 	"usertest.com/broker"
 	"usertest.com/event"
+	"usertest.com/user"
 )
 
-func AddNewUserController(uRe UserRepo, br broker.Broker) func(w http.ResponseWriter, r *http.Request) {
+func AddNewUserController(uRe user.UserRepo, br broker.Broker) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Print("AddNewUser end-point called")
 		d, err := io.ReadAll(r.Body)
@@ -23,7 +24,7 @@ func AddNewUserController(uRe UserRepo, br broker.Broker) func(w http.ResponseWr
 		}
 
 		log.Printf("Payload: %s\n", string(d))
-		data := NewUser()
+		data := user.NewUser()
 		json.Unmarshal(d, &data)
 
 		w.Header().Set("Content-Type", "application/json")

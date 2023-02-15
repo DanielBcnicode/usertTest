@@ -1,4 +1,4 @@
-package user
+package controller
 
 import (
 	"context"
@@ -9,9 +9,10 @@ import (
 	"github.com/gorilla/mux"
 	"usertest.com/broker"
 	"usertest.com/event"
+	"usertest.com/user"
 )
 
-func DeleteUserController(uRe UserRepo, br broker.Broker) func(w http.ResponseWriter, r *http.Request) {
+func DeleteUserController(uRe user.UserRepo, br broker.Broker) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("DeleteUser end-point called")
 		w.Header().Set("Content-Type", "application/json")

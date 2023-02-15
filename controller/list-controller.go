@@ -1,4 +1,4 @@
-package user
+package controller
 
 import (
 	"context"
@@ -7,10 +7,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"usertest.com/user"
 	"usertest.com/user/common"
 )
 
-func ListUserController(userRepository UserRepo) func(w http.ResponseWriter, r *http.Request) {
+func ListUserController(userRepository user.UserRepo) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("ListUser end-point called")
 		w.Header().Set("Content-Type", "application/json")
@@ -35,7 +36,7 @@ func ListUserController(userRepository UserRepo) func(w http.ResponseWriter, r *
 }
 
 // Get filters from url. Only get variables defined in repository.FilterFields map
-func filterData(r *http.Request) RepositoryFilter {
+func filterData(r *http.Request) user.RepositoryFilter {
 	f := make(map[string]string)
 
 	for i, _ := range common.FilterFields {
@@ -44,15 +45,15 @@ func filterData(r *http.Request) RepositoryFilter {
 			f[i] = va
 		}
 	}
-	return RepositoryFilter{Filters: f}
+	return user.RepositoryFilter{Filters: f}
 }
 
 // Get the paginator variables from the URL
 // Variable p contains the page wanted, 0 starting
 // Variable ps contains the items per page
-func paginationData(r *http.Request) Paginator {
+func paginationData(r *http.Request) user.Paginator {
 	p, _ := strconv.Atoi(r.URL.Query().Get("p"))
 	ps, _ := strconv.Atoi(r.URL.Query().Get("ps"))
 
-	return Paginator{CurrentPage: p, PagSize: ps}
+	return user.Paginator{CurrentPage: p, PagSize: ps}
 }
