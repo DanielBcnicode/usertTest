@@ -17,7 +17,22 @@ services:
       - postgresdb
     networks:
       - test
+  consumer:
+    build: 
+      context: .
+    container_name: consumer
+    restart: always
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
 
+    depends_on:
+      - message-broker
+    networks:
+      - test
   postgresdb:
     image: postgres:latest
     container_name: postgres_container

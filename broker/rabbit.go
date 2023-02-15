@@ -18,7 +18,7 @@ type Rabbit struct {
 	domainQueue *amqp.Queue
 }
 
-const domainQueue = "DomainQueue"
+const DomainQueue string = "DomainQueue"
 
 func NewRabbitConnectionForDomain(url string) (*Rabbit, error) {
 	conn, err := amqp.Dial(url)
@@ -35,7 +35,7 @@ func NewRabbitConnectionForDomain(url string) (*Rabbit, error) {
 	}
 
 	q, err := ch.QueueDeclare(
-		domainQueue,
+		DomainQueue,
 		false,
 		false,
 		false,
@@ -62,6 +62,17 @@ func (r *Rabbit) Close() {
 	r.conn.Close()
 }
 
+func (r *Rabbit) Consumer(queue string) (<- chan amqp.Delivery, error) {
+	return r.channel.Consume(
+		queue,
+		"", 
+		true, 
+		false, 
+		false, 
+		false, 
+		nil)
+}
+
 func (r *Rabbit) PublishDomainEvent(event *event.DomainEvent) error {
 
 	body, err := event.Serialize()
@@ -72,7 +83,7 @@ func (r *Rabbit) PublishDomainEvent(event *event.DomainEvent) error {
 
 	err = r.channel.Publish(
 		"",
-		domainQueue,
+		DomainQueue,
 		false,
 		false,
 		amqp.Publishing{
