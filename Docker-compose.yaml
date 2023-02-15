@@ -10,6 +10,7 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
+      - MB_URL=${MB_URL}
 
     ports:
       - "8088:8088"
@@ -20,6 +21,7 @@ services:
   consumer:
     build: 
       context: .
+      dockerfile: Dockerfile.consumer
     container_name: consumer
     restart: always
     environment:
@@ -28,6 +30,7 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
+      - MB_URL=${MB_URL}
 
     depends_on:
       - message-broker
