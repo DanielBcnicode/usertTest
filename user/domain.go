@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// User main entity for a user
 type User struct {
 	ID        uuid.UUID `json:"id,omitempty"`
 	FirstName string    `json:"first_name"`
@@ -19,39 +20,7 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func NewUserFromModel(
-	id uuid.UUID,
-	firstName string,
-	lastName string,
-	nickName string,
-	password string,
-	email string,
-	country string,
-	createdAt time.Time,
-	updateAt time.Time,
-) (User, error) {
-	return User{
-		ID:        id,
-		FirstName: firstName,
-		LastName:  lastName,
-		Nickname:  nickName,
-		Password:  password,
-		Email:     email,
-		CreatedAt: createdAt,
-		UpdatedAt: updateAt,
-	}, nil
-}
-
-// NewUserFromName create a User entity from a firstname and lastname
-func NewUserFromName(firstName, lastName string) User {
-	return User{
-		ID:        uuid.New(),
-		FirstName: firstName,
-		LastName:  lastName,
-		CreatedAt: time.Now(),
-	}
-}
-
+// User constructor
 func NewUser() User {
 	t := time.Now()
 	return User{
@@ -61,20 +30,23 @@ func NewUser() User {
 	}
 }
 
+// UpdateDate update the UpdatedAt field with now
 func (u *User) UpdateDate() {
 	u.UpdatedAt = time.Now()
 }
 
+// RepositoryFilter holds the url filters
 type RepositoryFilter struct {
 	Filters map[string]string
 }
 
+// Paginator data structure to handle the pages in queries
 type Paginator struct {
 	PagSize     int
 	CurrentPage int
-	NextPage    int
 }
 
+// UserRepo is the contract to the user repository
 type UserRepo interface {
 	Save(ctx context.Context, user *User) error
 	Update(ctx context.Context, user *User) error

@@ -11,14 +11,17 @@ import (
 	"usertest.com/user/common"
 )
 
+// UserRepository is the main postgres user repository
 type UserRepository struct {
 	Connection *PostgresConn
 }
 
+// NewUserPostgresRepository is the constructor
 func NewUserPostgresRepository(conn *PostgresConn) UserRepository {
 	return UserRepository{Connection: conn}
 }
 
+// Save a user in the db
 func (u *UserRepository) Save(ctx context.Context, user *user.User) error {
 	q := `
     INSERT INTO "user" ("id", "first_name", "last_name", "nickname", "password", "email",
@@ -33,6 +36,7 @@ func (u *UserRepository) Save(ctx context.Context, user *user.User) error {
 	return row.Err()
 }
 
+// Update a user in the db
 func (u *UserRepository) Update(ctx context.Context, user *user.User) error {
 	q := `
     UPDATE "user" SET "first_name"=$1, "last_name"=$2, "nickname"=$3, "password"=$4, "email"=$5,
@@ -56,6 +60,7 @@ func (u *UserRepository) Update(ctx context.Context, user *user.User) error {
 	return err
 }
 
+// Delete a user from the db
 func (u *UserRepository) Delete(ctx context.Context, userID uuid.UUID) error {
 	q := `
     DELETE FROM "user" WHERE "id"=$1;
@@ -79,6 +84,7 @@ func (u *UserRepository) Delete(ctx context.Context, userID uuid.UUID) error {
 	return err
 }
 
+// FindByFilter find users using filters and pagination
 func (u *UserRepository) FindByFilter(ctx context.Context, filter user.RepositoryFilter, paginator *user.Paginator) ([]user.User, error) {
 	d := make([]user.User, 0)
 	limit := 10
