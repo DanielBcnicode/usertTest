@@ -9,6 +9,7 @@ import (
 
 type Broker interface {
 	PublishDomainEvent(event *event.DomainEvent) error
+	Consumer(queue string) (<- chan amqp.Delivery, error)
 	Close()
 }
 
