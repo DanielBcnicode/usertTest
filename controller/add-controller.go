@@ -12,6 +12,7 @@ import (
 	"usertest.com/user"
 )
 
+// AddNewUserController is the http handler to add a new user
 func AddNewUserController(uRe user.UserRepo, br broker.Broker) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Print("AddNewUser end-point called")

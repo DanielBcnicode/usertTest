@@ -1,3 +1,7 @@
+/*
+The intention of this consumer is check if the events are sent to the queue and verify his content
+*/
+
 package main
 
 import (

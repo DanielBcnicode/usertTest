@@ -55,7 +55,6 @@ services:
     volumes:
       - ./pg/pg_data:/var/lib/postgresql/data
       - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
-      #- ./pg/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     networks:
       - test
   message-broker:
@@ -64,33 +63,12 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
-    #volumes:
-    #  - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
-    #  - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
     restart: always
     networks:
       - test
 
-#  postgresdb_test:
-#    image: postgres:latest
-#    container_name: postgres_test_container
-#    environment:
-#      - POSTGRES_USER=${TEST_DB_USER}
-#      - POSTGRES_PASSWORD=${TEST_DB_PASSWORD}
-#      - POSTGRES_DB=${TEST_DB_NAME}
-#      - DATABASE_HOST=${TEST_DB_HOST}
-#    ports:
-#      - '4568:5432'
-#    volumes:
-#      - ./pg/pg_data_test:/var/lib/postgresql/data
-#      - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
-#      #- ./pg/pg_hba_test.conf:/var/lib/postgresql/data/pg_hba.conf
-#    networks:
-#      - test
-
 volumes:
   pg_data:
-  pg_data_test:
 
 # Networks to be created to facilitate communication between containers
 networks:

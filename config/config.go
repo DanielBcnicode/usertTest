@@ -2,6 +2,7 @@ package config
 
 import "os"
 
+// DatabaseConfig is the struct to hold the parameters to the db connection
 type DatabaseConfig struct {
 	Host     string
 	Port     string
@@ -10,11 +11,13 @@ type DatabaseConfig struct {
 	Database string
 }
 
+// Config holds the app configuration
 type Config struct {
 	Db DatabaseConfig
 	MessageBroker string
 }
 
+// GetConfig fills the configuration and return a Config object
 func GetConfig() *Config {
 	return &Config{
 		Db: DatabaseConfig{

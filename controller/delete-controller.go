@@ -12,6 +12,7 @@ import (
 	"usertest.com/user"
 )
 
+// DeleteUserController is the http handle to delete an user
 func DeleteUserController(uRe user.UserRepo, br broker.Broker) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("DeleteUser end-point called")

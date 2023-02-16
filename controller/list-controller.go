@@ -11,6 +11,7 @@ import (
 	"usertest.com/user/common"
 )
 
+// ListUserController is the http handle to list users using filters and pagination
 func ListUserController(userRepository user.UserRepo) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("ListUser end-point called")

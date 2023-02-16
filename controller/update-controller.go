@@ -14,6 +14,7 @@ import (
 	"usertest.com/user"
 )
 
+// UpdateUserController http handle to update a user
 func UpdateUserController(uRe user.UserRepo, br broker.Broker) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("UpdateUser end-point called")
